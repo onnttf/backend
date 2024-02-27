@@ -25,3 +25,9 @@ go.work
 
 # Visual Studio Code
 .vscode
+
+# MacOS
+.DS_Store
+
+# Logs 
+logs

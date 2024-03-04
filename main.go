@@ -1,24 +1,22 @@
 package main
 
 import (
+	"backend/controller/petrol_price"
+	"backend/dal"
 	"backend/util/logger"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"net/http"
 )
 
-type gasoline struct {
-	Price_92 string `json:"price_92"`
-	Price_95 string `json:"price_95"`
-	Price_98 string `json:"price_98"`
-}
-
-type City struct {
-	Zhcity string `json:"zhcity"`
-	City   string `json:"city"`
-}
-
 func main() {
+	l := logger.Get()
+	err := dal.InitMySQL()
+	if err != nil {
+		l.Info().Msg("222")
+		l.Error().Err(err).Msg("init MySQL failed")
+		panic(err)
+	}
 	e := echo.New()
 	e.Use(middleware.RequestID())
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
@@ -30,7 +28,6 @@ func main() {
 		LogStatus:    true,
 		LogError:     true,
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			l := logger.Get()
 			if v.Error == nil {
 				l.Info().
 					Str("remote_ip", v.RemoteIP).
@@ -55,8 +52,10 @@ func main() {
 		},
 	}))
 	e.Use(middleware.Recover())
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Use(middleware.CORS())
+	e.GET("/api/petrol_price", petrol_price.Query)
+	if err := e.Start(":1323"); err != nil {
+		l.Error().Err(err).Msg("start echo server failed")
+		panic(err)
+	}
 }

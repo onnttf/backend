@@ -53,7 +53,7 @@ func main() {
 	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
-	e.GET("/api/petrol_price", petrol_price.Query)
+	petrol_price.RegisterRoutes(e.Group("/petrol_price"))
 	if err := e.Start(":1323"); err != nil {
 		l.Error().Err(err).Msg("start echo server failed")
 		panic(err)

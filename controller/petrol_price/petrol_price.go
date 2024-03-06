@@ -11,7 +11,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Query(c echo.Context) error {
+func RegisterRoutes(group *echo.Group) {
+	group.GET("", query)
+}
+
+func query(c echo.Context) error {
 	region := c.QueryParam("region")
 	if len(region) == 0 {
 		region = "北京"
